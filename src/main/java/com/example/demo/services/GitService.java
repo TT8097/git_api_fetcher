@@ -10,9 +10,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchProperties;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.URI;
@@ -38,23 +44,17 @@ public class GitService {
 
     public List<RepositoryModel> getRepositories(String name ) throws IOException, InterruptedException {
 
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(urlService.urlRepository(name))).build();
-        HttpResponse<String> responseEntity =httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        if(responseEntity.statusCode()==404){
-            throw new IllegalArgumentException();
-        }
+        ResponseEntity<List<RepositoryModel>> responseEntity = new RestTemplate().exchange(URI.create(urlService.urlRepository(name)), HttpMethod.GET, null, new ParameterizedTypeReference<List<RepositoryModel>>() {});
 
-        return maper.readValue(responseEntity.body(),new TypeReference<>() {});
+        return responseEntity.getBody();
 
     }
     public List<RepositoryModel> filterRepositories(List<RepositoryModel> repositories){
         return repositories.stream().filter(x-> !x.fork).toList();
     }
    public List<BranchModel> getBranches(String url) throws IOException, InterruptedException {
-        url= urlService.urlBranches(url);
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
-        HttpResponse<String> responseEntity = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        return maper.readValue(responseEntity.body(),new TypeReference<>() {});
+        ResponseEntity<List<BranchModel>> responseEntity = new RestTemplate().exchange(urlService.urlBranches(url), HttpMethod.GET, null, new ParameterizedTypeReference<List<BranchModel>>() {});
+        return responseEntity.getBody();
     }
     public ResponseEntity<?> response(String name)  {
         try (ExecutorService executor =  Executors.newVirtualThreadPerTaskExecutor()){
@@ -77,15 +77,15 @@ public class GitService {
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(responses);
-        }catch (IllegalArgumentException e){
+        }catch (HttpClientErrorException.NotFound e) {
+
+            System.out.println("Błąd: Repozytorium użytkownika " + name + " nie zostało znalezione.");
 
             return ResponseEntity.status(404).body(new NotFoundResponseModel());
+        } catch (Exception e) {
 
-        }catch (IOException | InterruptedException | ExecutionException e) {
-
-            System.out.println(e.getMessage());
+            System.out.println("Błąd : " + " - " + e.getMessage());
             return ResponseEntity.status(500).build();
-
         }
     }
 

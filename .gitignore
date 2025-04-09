@@ -22,3 +22,81 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+### Java ###
+# Pliki klasy kompilowanej
+*.class
+
+# Pliki JAR/WAR
+*.jar
+*.war
+*.ear
+
+# Pliki zależności, które mogą być generowane podczas kompilacji
+*.jar.d
+*.war.d
+
+### Maven ###
+# Katalogi generowane przez Maven
+/target/
+
+# Pliki zależności Mavena
+*.iml
+*.log
+*.swp
+
+# Wykonane pliki z pobranego artefaktu
+#*/*.tar.gz
+#*/*.zip
+
+# Pliki ustawień środowiskowych
+.settings/
+.idea/
+
+### Gradle ###
+# Katalogi generowane przez Gradle
+.gradle/
+
+# Pliki buildowe Gradle
+/build/
+
+# Pliki konfiguracyjne dla środowiska
+gradle-wrapper.jar
+gradle-wrapper.properties
+
+### IntelliJ IDEA ###
+# Pliki konfiguracyjne IDE IntelliJ
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+# Pliki konfiguracyjne IDE Eclipse
+.project
+.classpath
+.settings/
+
+### NetBeans ###
+# Pliki konfiguracyjne IDE NetBeans
+nbproject/
+
+### Logi ###
+# Katalogi i pliki logów
+*.log
+
+### Spring Boot ###
+# Katalogi generowane przez Spring Boot
+*.pid
+*.bak
+
+# Wytwórnia
+*.stamp
+
+### Pliki systemowe ###
+.DS_Store
+Thumbs.db
+
+### Inne ###
+# Pliki do cache'owania
+*.cache
+*.tmp
