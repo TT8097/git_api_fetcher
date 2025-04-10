@@ -32,11 +32,11 @@ import java.util.concurrent.*;
 
 @Service
 public class GitService {
-    HttpClient httpClient;
+    RestTemplate httpClient;
     ObjectMapper maper;
     UrlService urlService;
     @Autowired
-    public GitService(HttpClient httpClient, ObjectMapper maper ,UrlService urlService) {
+    public GitService(RestTemplate httpClient, ObjectMapper maper ,UrlService urlService) {
         this.httpClient = httpClient;
         this.maper = maper;
         this.urlService=urlService;
@@ -44,7 +44,7 @@ public class GitService {
 
     public List<RepositoryModel> getRepositories(String name ) throws IOException, InterruptedException {
 
-        ResponseEntity<List<RepositoryModel>> responseEntity = new RestTemplate().exchange(URI.create(urlService.urlRepository(name)), HttpMethod.GET, null, new ParameterizedTypeReference<List<RepositoryModel>>() {});
+        ResponseEntity<List<RepositoryModel>> responseEntity = httpClient.exchange(URI.create(urlService.urlRepository(name)), HttpMethod.GET, null, new ParameterizedTypeReference<List<RepositoryModel>>() {});
 
         return responseEntity.getBody();
 
@@ -53,7 +53,7 @@ public class GitService {
         return repositories.stream().filter(x-> !x.fork).toList();
     }
    public List<BranchModel> getBranches(String url) throws IOException, InterruptedException {
-        ResponseEntity<List<BranchModel>> responseEntity = new RestTemplate().exchange(urlService.urlBranches(url), HttpMethod.GET, null, new ParameterizedTypeReference<List<BranchModel>>() {});
+        ResponseEntity<List<BranchModel>> responseEntity = httpClient.exchange(urlService.urlBranches(url), HttpMethod.GET, null, new ParameterizedTypeReference<List<BranchModel>>() {});
         return responseEntity.getBody();
     }
     public ResponseEntity<?> response(String name)  {
